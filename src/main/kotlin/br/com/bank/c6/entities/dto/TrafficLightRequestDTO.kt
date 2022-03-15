@@ -1,14 +1,14 @@
 package br.com.bank.c6.entities.dto
 
 data class TrafficLightRequestDTO(
-    val pairOfStreetTraffics: Pair<StreetTrafficDTO, StreetTrafficDTO>
+    val trafficLights: List<TrafficLightDTO>
 )
 
-fun Pair<String, String>.toTrafficLightRequestDTO(): TrafficLightRequestDTO {
-
-    val firstTrafficLight = StreetTrafficDTO(streetName = this.first)
-    val secondTrafficLight = StreetTrafficDTO(streetName = this.second)
-
-    return TrafficLightRequestDTO(pairOfStreetTraffics = Pair(firstTrafficLight, secondTrafficLight))
+fun List<String>.toTrafficLightRequestDTO(): TrafficLightRequestDTO {
+    val listOfTrafficLights = this.mapIndexed { index, s ->
+        TrafficLightDTO(position = index, streetName = s)
+    }
+    return TrafficLightRequestDTO(listOfTrafficLights)
 }
+
 

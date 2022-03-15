@@ -1,6 +1,6 @@
 package br.com.bank.c6.service.impl
 
-import br.com.bank.c6.entities.dto.StreetTrafficDTO
+import br.com.bank.c6.entities.dto.TrafficLightDTO
 import br.com.bank.c6.entities.dto.TrafficLightRequestDTO
 import br.com.bank.c6.entities.enum.ColorEnum
 import br.com.bank.c6.entities.enum.TrafficLightEnum
@@ -20,26 +20,27 @@ class TrafficLightServiceImpl : TrafficLightService {
     }
 
     private fun scheduleAllTraffics(trafficLightRequestDTO: TrafficLightRequestDTO) {
-        var currentTraffic = trafficLightRequestDTO.pairOfStreetTraffics.first
+
+        var currentTrafficLight = trafficLightRequestDTO.trafficLights.first()
 
         while (true) {
-            currentTraffic = displayAndTurnNextLight(currentTraffic, trafficLightRequestDTO)
+            currentTrafficLight = displayAndTurnNext(currentTrafficLight, trafficLightRequestDTO)
         }
     }
 
-    private fun displayAndTurnNextLight(currentTraffic: StreetTrafficDTO, trafficsLightDTO: TrafficLightRequestDTO): StreetTrafficDTO {
+    private fun displayAndTurnNext(currentTraffic: TrafficLightDTO, trafficsLightDTO: TrafficLightRequestDTO): TrafficLightDTO {
         displaysCurrentColor(currentTraffic)
         return getNextColorOrTrafficLight(currentTraffic, trafficsLightDTO)
     }
 
-    private fun displaysCurrentColor(currentTraffic: StreetTrafficDTO) {
+    private fun displaysCurrentColor(currentTraffic: TrafficLightDTO) {
         currentTraffic.displaysCurrentColor()
         waitForDuration(currentTraffic.trafficLightEnum.timeSeconds)
     }
 
     private fun waitForDuration(timeSeconds: Int) = Thread.sleep((timeSeconds * 1000).toLong())
 
-    private fun getNextColorOrTrafficLight(currentTraffic: StreetTrafficDTO, trafficLightRequest: TrafficLightRequestDTO): StreetTrafficDTO {
+    private fun getNextColorOrTrafficLight(currentTraffic: TrafficLightDTO, trafficLightRequest: TrafficLightRequestDTO): TrafficLightDTO {
         val currentColor = currentTraffic.trafficLightEnum.color
 
         if (currentColor != ColorEnum.RED) {
@@ -49,15 +50,14 @@ class TrafficLightServiceImpl : TrafficLightService {
         return getNextTrafficLight(currentTraffic, trafficLightRequest)
     }
 
-    private fun getNextColor(currentTraffic: StreetTrafficDTO): StreetTrafficDTO {
+    private fun getNextColor(currentTraffic: TrafficLightDTO): TrafficLightDTO {
         val nextLightEnum = TrafficLightEnum.getNextLight(currentTraffic.trafficLightEnum)
         return currentTraffic.copy(trafficLightEnum = nextLightEnum)
     }
 
-    private fun getNextTrafficLight(currentTraffic: StreetTrafficDTO, trafficLightRequest: TrafficLightRequestDTO): StreetTrafficDTO {
-        return when (currentTraffic.streetName) {
-            trafficLightRequest.pairOfStreetTraffics.first.streetName -> trafficLightRequest.pairOfStreetTraffics.second
-            else -> trafficLightRequest.pairOfStreetTraffics.first
-        }
+    private fun getNextTrafficLight(currentTraffic: TrafficLightDTO, trafficLightRequest: TrafficLightRequestDTO): TrafficLightDTO {
+        val nextPosition = currentTraffic.position.plus(1)
+        return trafficLightRequest.trafficLights.find { it.position == nextPosition}
+            ?: trafficLightRequest.trafficLights.first()
     }
 }

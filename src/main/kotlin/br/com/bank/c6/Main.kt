@@ -5,7 +5,9 @@ fun main(args: Array<String>) {
     val trafficLightController = TrafficLightControllerImpl()
 
     trafficLightController.initializeTrafficLights(
-        firstStreetName = "Alameda Barros",
-        secondStreetName = "Avenida Angélica"
+        "Alameda Barros",
+        "Avenida Angélica"
     )
+
+
 }
